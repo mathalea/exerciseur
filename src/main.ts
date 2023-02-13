@@ -1,5 +1,6 @@
 import './style.css'
 import duree from './exercices/duree'
+import horaireDebut from './exercices/horaireDebut'
 
 const app = document.querySelector('#app') as HTMLDivElement
 
@@ -14,6 +15,7 @@ function errorComponent (div: HTMLElement) {
 
 const routes = [
   {path: 'duree', component: duree},
+  {path: 'horaireDebut', component: horaireDebut},
 ]
 
 const findComponentByPath = (path: string, routes: route[]) => routes.find(route => route.path === path) || undefined;
@@ -30,9 +32,8 @@ function resolveRoute(route: string) {
 
 function router(): void {
   const url = new URL(document.URL)
-  const paths = url.pathname.split("/").filter(entry => entry !== "")
-  const lastPath = paths[paths.length - 1];
-  resolveRoute(lastPath)
+  const params = url.search
+  resolveRoute(params.replace('?', ''))
 }
 
 window.addEventListener('load', router)
