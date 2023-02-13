@@ -2,37 +2,42 @@ class HMS {
   hour: number
   minute: number
   second: number
-  constructor({ hour = 0, minute = 0, second = 0 }: { hour?: number; minute?: number; second?: number } = {}) {
+  sign: '' | '+' | '-'
+  constructor({ hour = 0, minute = 0, second = 0, sign = '' }: { hour?: number; minute?: number; second?: number, sign?: '+' | '-' | '' } = {}) {
     this.hour = hour
     this.minute = minute
     this.second = second
+    this.sign = sign
   }
   static fromString(text: string): HMS {
     const hms = new HMS()
 
     if (text.includes('min') && !text.includes('s')) {
       // Format sans le s pour les secondes 4min33, 5h3min15
-      const regex = /(?:(?<hour>\d+)\s*h\s*)?(?:(?<minute>\d+)\s*min\s*)?(?:(?<second>\d+))?/gm
+      const regex = /(?:(?<sign>[+,-]))?(?:(?<hour>\d+)\s*h\s*)?(?:(?<minute>\d+)\s*min\s*)?(?:(?<second>\d+))?/gm
       for (const match of text.matchAll(regex)) {
         if (match.groups !== undefined && Number.isInteger(parseInt(match.groups.hour))) hms.hour = parseInt(match.groups.hour)
         if (match.groups !== undefined && Number.isInteger(parseInt(match.groups.minute))) hms.minute = parseInt(match.groups.minute)
         if (match.groups !== undefined && Number.isInteger(parseInt(match.groups.second))) hms.second = parseInt(match.groups.second)
+        if (match.groups !== undefined && (match.groups.sign === '+' || match.groups.sign === '-')) hms.sign = match.groups.sign
       }
     } else if (text.includes('h') && !text.includes('min') && !text.includes('s')) {
       // Format sans le min pour les minutes 5h13
-      const regex = /(?:(?<hour>\d+)\s*h\s*)?(?:(?<minute>\d+))?/gm
+      const regex = /(?:(?<sign>[+,-]))?(?:(?<hour>\d+)\s*h\s*)?(?:(?<minute>\d+))?/gm
       for (const match of text.matchAll(regex)) {
         if (match.groups !== undefined && Number.isInteger(parseInt(match.groups.hour))) hms.hour = parseInt(match.groups.hour)
         if (match.groups !== undefined && Number.isInteger(parseInt(match.groups.minute))) hms.minute = parseInt(match.groups.minute)
         if (match.groups !== undefined && Number.isInteger(parseInt(match.groups.second))) hms.second = parseInt(match.groups.second)
+        if (match.groups !== undefined && (match.groups.sign === '+' || match.groups.sign === '-')) hms.sign = match.groups.sign
       }
     } else {
       // Format HMS classique
-      const regex = /(?:(?<hour>\d+)\s*h\s*)?(?:(?<minute>\d+)\s*min\s*)?(?:(?<second>\d+)\s*s)?/gm
+      const regex = /(?:(?<sign>[+,-]))?(?:(?<hour>\d+)\s*h\s*)?(?:(?<minute>\d+)\s*min\s*)?(?:(?<second>\d+)\s*s)?/gm
       for (const match of text.matchAll(regex)) {
         if (match.groups !== undefined && Number.isInteger(parseInt(match.groups.hour))) hms.hour = parseInt(match.groups.hour)
         if (match.groups !== undefined && Number.isInteger(parseInt(match.groups.minute))) hms.minute = parseInt(match.groups.minute)
         if (match.groups !== undefined && Number.isInteger(parseInt(match.groups.second))) hms.second = parseInt(match.groups.second)
+        if (match.groups !== undefined && (match.groups.sign === '+' || match.groups.sign === '-')) hms.sign = match.groups.sign
       }
     }
     return hms
@@ -45,7 +50,7 @@ class HMS {
       if (this.minute > 0 || this.second > 0) result += ' '
     }
     if (this.minute > 0) {
-      result += `${this.minute} min`
+      result += (this.minute > 9) ? `${this.minute} min` : `0${this.minute} min`
       if (this.second > 0) result += ' '
     }
     if (this.second > 0) result += `${this.second} s`
@@ -59,6 +64,14 @@ class HMS {
     if (this.hour > 0 && this.second === 0) return this.toString().replace(' min', '')
     else if (this.minute > 0) return this.toString().replace(' s', '')
     else return this.toString()
+  }
+
+  isGreaterThan (time: HMS): boolean {
+    return (this.toSeconds() > time.toSeconds())
+  }
+
+  isEqual (time: HMS): boolean {
+    return (this.toSeconds() === time.toSeconds())
   }
 
   isEquivalentToString(text: string): boolean {
@@ -85,7 +98,7 @@ class HMS {
 
   add(time: HMS): HMS {
     const result = new HMS()
-    result.second = this.second + time.toSeconds()
+    result.second = this.toSeconds() + time.toSeconds()
     result.normalize()
     return result
   }

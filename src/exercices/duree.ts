@@ -78,38 +78,35 @@ export default function exerciceDuree(app: HTMLElement) {
   divStepTotal.style.gridColumn = '3'
   divQuestion.style.columnGap = '30px'
 
-  let startHour: HMS
-  let middleHour: HMS
-  let endHour: HMS
-  let stepTotalHour: HMS
-
-  function init (): void {
-      startHour = new HMS({ hour: randint(1, 23), minute: randint(1, 59) })
-      middleHour = new HMS()
-      endHour = new HMS({ hour: startHour.hour + randint(1, 3), minute: randint(1, startHour.minute - 1) })
-      stepTotalHour = endHour.substract(startHour)
-      divEnonce.innerText = `Un évènement commence à ${startHour.toString2()} et se termine à ${endHour.toString2()}. Combien de temps a-t-il duré ?`
-      divStart.innerText = startHour.toString()
-      divEnd.innerText = endHour.toString()
-      divStep1.innerText = '+/- ?'
-      divStep2.innerText = '+/- ?'
-      divStepTotal.innerText = '+ ?'
-      divMiddle.innerText = ''
-      divStep1.style.color = 'black'
-      divStep2.style.color = 'black'
-      divStepTotal.style.color = 'black'
+  function init(): void {
+    const startHour = new HMS({ hour: randint(2, 21), minute: randint(1, 59) })
+    const endHour = new HMS({ hour: startHour.hour + randint(1, 3), minute: randint(1, startHour.minute - 1) })
+    divEnonce.innerText = `Un évènement commence à ${startHour.toString()} et se termine à ${endHour.toString()}. Combien de temps a-t-il duré ?`
+    divStart.innerText = startHour.toString()
+    divEnd.innerText = endHour.toString()
+    divStep1.innerText = '+/- ?'
+    divStep2.innerText = '+/- ?'
+    divStepTotal.innerText = '+ ?'
+    divMiddle.innerText = ''
+    divStep1.style.color = 'black'
+    divStep2.style.color = 'black'
+    divStepTotal.style.color = 'black'
+    divFeedback.innerText = ''
   }
 
   init()
-
-  
 
   new LeaderLine(divStart, divMiddle, { dropShadow: true })
   new LeaderLine(divMiddle, divEnd, { dropShadow: true })
   new LeaderLine(divStart, divEnd, { path: 'arc', dropShadow: true, startSocket: 'bottom', endSocket: 'bottom', startSocketGravity: 400 })
 
   button.addEventListener('click', () => {
-    if (checkStep1() && checkStep2() && checkStepTotal()) {
+    if (
+      checkAllStep() ||
+      (checkStep(divStart, divStepTotal, divEnd) &&
+        HMS.fromString(divStep1.innerText).toSeconds() === 0 &&
+        HMS.fromString(divStep2.innerText).toSeconds() === 0)
+    ) {
       divFeedback.innerText = 'Bravo !'
       divFeedback.style.color = 'green'
     } else {
@@ -124,14 +121,17 @@ export default function exerciceDuree(app: HTMLElement) {
   divStep2.addEventListener('focusin', () => removeQuestionMark(divStep2))
   divStepTotal.addEventListener('focusin', () => removeQuestionMark(divStepTotal))
 
-  divStep1.addEventListener('focusout', checkStep1)
-  divStep2.addEventListener('focusout', checkStep2)
-  divStepTotal.addEventListener('focusout', checkStepTotal)
-  divMiddle.addEventListener('focusout', () => {
-    updateMiddleHour()
-    checkStep1()
-    checkStep2()
-  })
+  divStep1.addEventListener('focusout', checkAllStep)
+  divStep2.addEventListener('focusout', checkAllStep)
+  divStepTotal.addEventListener('focusout', checkAllStep)
+  divMiddle.addEventListener('focusout', checkAllStep)
+
+  function checkAllStep(): boolean {
+    checkStep(divStart, divStep1, divMiddle)
+    checkStep(divMiddle, divStep2, divEnd)
+    checkStep(divStart, divStepTotal, divEnd)
+    return checkStep(divStart, divStep1, divMiddle) && checkStep(divMiddle, divStep2, divEnd) && checkStep(divStart, divStepTotal, divEnd)
+  }
 
   function removeQuestionMark(element: HTMLDivElement): void {
     element.innerText = element.innerText.replace('+/- ?', '')
@@ -139,35 +139,19 @@ export default function exerciceDuree(app: HTMLElement) {
     element.style.color = 'black'
   }
 
-  function checkStepTotal(): boolean {
-    if (stepTotalHour.isEquivalentToString(divStepTotal.innerText)) {
-      divStepTotal.style.color = 'green'
+  function checkStep(divStart: HTMLElement, divStep: HTMLElement, divEnd: HTMLElement): boolean {
+    const hourStart = HMS.fromString(divStart.innerText)
+    const hourStep = HMS.fromString(divStep.innerText)
+    const hourEnd = HMS.fromString(divEnd.innerText)
+    if (
+      hourStart.substract(hourEnd).isEqual(hourStep) &&
+      ((hourStep.sign !== '-' && hourEnd.isGreaterThan(hourStart)) || (hourStep.sign === '-' && hourStart.isGreaterThan(hourEnd)))
+    ) {
+      divStep.style.color = 'green'
       return true
     } else {
-      divStepTotal.style.color = 'red'
+      divStep.style.color = 'black'
       return false
     }
-  }
-  function checkStep1(): boolean {
-    if (middleHour.substract(startHour).isEquivalentToString(divStep1.innerText) || HMS.fromString(divStep1.innerText).toSeconds() === 0) {
-      if (HMS.fromString(divStep1.innerText).toSeconds() !== 0) divStep1.style.color = 'green'
-      return true
-    } else {
-      divStep1.style.color = 'red'
-      return false
-    }
-  }
-  function checkStep2(): boolean {
-    if (endHour.substract(middleHour).isEquivalentToString(divStep2.innerText) || HMS.fromString(divStep2.innerText).toSeconds() === 0) {
-      if (HMS.fromString(divStep2.innerText).toSeconds() !== 0) divStep2.style.color = 'green'
-      return true
-    } else {
-      divStep2.style.color = 'red'
-      return false
-    }
-  }
-
-  function updateMiddleHour(): void {
-    middleHour = HMS.fromString(divMiddle.innerText)
   }
 }
