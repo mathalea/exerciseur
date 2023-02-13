@@ -147,6 +147,7 @@ export default function exerciceDuree(app: HTMLElement) {
     divMiddle2.innerText = ''
     divStep1.style.color = 'black'
     divStep2.style.color = 'black'
+    divStep3.style.color = 'black'
     divStepTotal.style.color = 'black'
     divFeedback.innerText = ''
   }
