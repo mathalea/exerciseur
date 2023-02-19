@@ -3,34 +3,50 @@
   import Operation from './math/operations'
   import { randint } from './math/random'
   import Title from '../ui/Title.svelte'
-
+  
+  /** Division par 60 étape 1*/
   let spanMinutes1: HTMLSpanElement
   let spanSeconds1: HTMLSpanElement
+  let isMinutes1 = false
+  let isSeconds1 = false
+  let typeFeedbackDivisionPar60Etape1: '' | 'tryAgain'
+  /** Division par 60 étape 2*/
   let spanHours2: HTMLSpanElement
   let spanMinutes2: HTMLSpanElement
   let spanSeconds2: HTMLSpanElement
+  let isSeconds2 = false
+  let isMinutes2 = false
+  let isHours2 = false
+  /** Division par 3600 étape 1*/
   let spanHours36001: HTMLSpanElement
   let spanMinutes36001: HTMLSpanElement
   let spanSeconds36001: HTMLSpanElement
   let timeInSeconds = randint(3800, 9000)
-  let operationSelected: string
-  let isPartie1Visible: boolean
-  let isMinutes1 = false
-  let isSeconds1 = false
-  let isSeconds2 = false
-  let isMinutes2 = false
-  let isHours2 = false
   let isHours36001 = false
   let isMinutes36001 = false
   let isSeconds36001 = false
-  let typeFeedback: '' | 'success' | 'tryAgain' = ''
-  let typeFeedback1: '' | 'tryAgain'
-  let typeFeedback36001: '' | 'tryAgain'
+  let typeFeedbackDivisionPar3600Etape1: '' | 'tryAgain'
+  let typeFeedbackFinal: '' | 'success' | 'tryAgain' = ''
 
-  function checkOperation(): void {
-    isPartie1Visible = operationSelected === 'Division'
+  let operation1Selected: string
+  let operation2Selected: string
+
+  function initChecksPartie1 (): void {
+    isMinutes1 = false
+    isSeconds1 = false
+    isHours36001 = false
+    isMinutes36001 = false
+    isSeconds36001 = false
+    isHours2 = false
+    isMinutes2 = false
+    isSeconds2 = false
+    typeFeedbackDivisionPar60Etape1 = ''
+    typeFeedbackDivisionPar3600Etape1 = ''
+    typeFeedbackFinal =''
   }
 
+
+  /** On vérifie que le nombre saisi est bien le nombre attendu */
   function check(span: HTMLSpanElement, n: number): boolean {
     if (span !== undefined && span.textContent === n.toString()) {
       span.style.color = 'green'
@@ -67,9 +83,9 @@
   }
 
   function checkStep36001(): void {
-    if (spanHours36001.innerText.length === 0 || spanSeconds36001.innerText.length === 0) typeFeedback36001 = ''
-    else if (!isHours36001 || (!isMinutes36001 && spanMinutes36001.innerText.length > 0) || !isSeconds36001) typeFeedback36001 = 'tryAgain'
-    else typeFeedback36001 = ''
+    if (spanHours36001.innerText.length === 0 || spanSeconds36001.innerText.length === 0) typeFeedbackDivisionPar3600Etape1 = ''
+    else if (!isHours36001 || (!isMinutes36001 && spanMinutes36001.innerText.length > 0) || !isSeconds36001) typeFeedbackDivisionPar3600Etape1 = 'tryAgain'
+    else typeFeedbackDivisionPar3600Etape1 = ''
   }
 
   function checkHours2(): void {
@@ -88,14 +104,14 @@
   }
 
   function checkStep1(): void {
-    if (spanMinutes1.innerText.length === 0 || spanSeconds1.innerText.length === 0) typeFeedback1 = ''
-    else if (!isMinutes1 || !isSeconds1) typeFeedback1 = 'tryAgain'
-    else typeFeedback1 = ''
+    if (spanMinutes1.innerText.length === 0 || spanSeconds1.innerText.length === 0) typeFeedbackDivisionPar60Etape1 = ''
+    else if (!isMinutes1 || !isSeconds1) typeFeedbackDivisionPar60Etape1 = 'tryAgain'
+    else typeFeedbackDivisionPar60Etape1 = ''
   }
   function checkExercice(): void {
-    if (spanHours2.innerText.length === 0 || spanMinutes2.innerText.length === 0 || spanSeconds2.innerText.length === 0) typeFeedback = ''
-    else if (!isHours2 || !isMinutes2 || !isSeconds2) typeFeedback = 'tryAgain'
-    else typeFeedback = 'success'
+    if (spanHours2.innerText.length === 0 || spanMinutes2.innerText.length === 0 || spanSeconds2.innerText.length === 0) typeFeedbackFinal = ''
+    else if (!isHours2 || !isMinutes2 || !isSeconds2) typeFeedbackFinal = 'tryAgain'
+    else typeFeedbackFinal = 'success'
   }
 </script>
 
@@ -110,7 +126,7 @@
 
   <p>Quel calcul souhaites-tu faire ?</p>
 
-  <select name="listeOperations" bind:value={operationSelected} on:change={checkOperation}>
+  <select name="listeOperations" bind:value={operation1Selected} on:change={initChecksPartie1}>
     <option value="" />
     <option value="Multiplication">Multiplier {timeInSeconds} par 60</option>
     <option value="Multiplication">Multiplier {timeInSeconds} par 3 600</option>
@@ -118,14 +134,14 @@
     <option value="Division3600">Diviser {timeInSeconds} par 3 600</option>
   </select>
 
-  {#if operationSelected === 'Multiplication'}
+  {#if operation1Selected === 'Multiplication'}
     <div>
       Ce n'est pas la bonne opération. Les secondes sont plus petites que les minutes et les heures. Il faut 60 secondes pour faire une
       minute et 3 600 s pour faire une heure.<br />
       Choisis une autre opération.
     </div>
   {/if}
-  {#if operationSelected === 'Division'}
+  {#if operation1Selected === 'Division'}
     <div>
       <div>
         Il y a 60 secondes dans une minute donc on cherche combien de fois il y a 60 s dans {timeInSeconds} s pour trouver le nombre de minutes.
@@ -137,7 +153,7 @@
         Donc {timeInSeconds} s = <span contenteditable="true" class="reponse" bind:this={spanMinutes1} on:keyup={checkMinutes1} /> min
         <span contenteditable="true" bind:this={spanSeconds1} class="reponse" on:keyup={checkSeconds1} /> s.
       </div>
-      <Feedback type={typeFeedback1} />
+      <Feedback type={typeFeedbackDivisionPar60Etape1} />
     </div>
     {#if isMinutes1 && isSeconds1}
     <div id="calcul2">
@@ -153,12 +169,12 @@
           <span contenteditable="true" class="reponse" on:keyup={checkMinutes2} bind:this={spanMinutes2} />
           min <span contenteditable="true" class="reponse" on:keyup={checkSeconds2} bind:this={spanSeconds2} /> s.
         </div>
-        <Feedback type={typeFeedback} />
+        <Feedback type={typeFeedbackFinal} />
       </div>
     </div>
     {/if}
   {/if}
-  {#if operationSelected === 'Division3600'}
+  {#if operation1Selected === 'Division3600'}
     <div>
       <div>
         Il y a 3 600 secondes dans une heure donc on cherche combien de fois il y a 3 600 s dans {timeInSeconds} s pour connaître le nombre d'heures.
@@ -170,9 +186,9 @@
         Donc {timeInSeconds} s = <span contenteditable="true" class="reponse" bind:this={spanHours36001} on:keyup={checkHours36001} /> h
         <span contenteditable="true" bind:this={spanMinutes36001} class="reponse" on:keyup={checkMinutes36001} /> min <span contenteditable="true" bind:this={spanSeconds36001} class="reponse" on:keyup={checkSeconds36001} /> s.
       </div>
-      <Feedback type={typeFeedback36001} />
+      <Feedback type={typeFeedbackDivisionPar3600Etape1} />
     </div>
-    {#if isHours36001 && isSeconds36001 && (isMinutes36001 || spanMinutes36001.innerText.length === 0)}
+    {#if isHours36001 && isSeconds36001 && (isMinutes36001 || spanMinutes36001?.innerText.length === 0)}
     <div id="calcul2">
       <div style="margin-top: 30px">
         Le nombre de secondes dépasse 60, donc on va chercher le nombre de minutes.
@@ -186,7 +202,7 @@
           <span contenteditable="true" class="reponse" on:keyup={checkMinutes2} bind:this={spanMinutes2} />
           min <span contenteditable="true" class="reponse" on:keyup={checkSeconds2} bind:this={spanSeconds2} /> s.
         </div>
-        <Feedback type={typeFeedback} />
+        <Feedback type={typeFeedbackFinal} />
       </div>
     </div>
     {/if}
