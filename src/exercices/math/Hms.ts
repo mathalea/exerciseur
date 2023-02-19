@@ -3,13 +3,14 @@ class HMS {
   minute: number
   second: number
   sign: '' | '+' | '-'
-  constructor({ hour = 0, minute = 0, second = 0, sign = '' }: { hour?: number; minute?: number; second?: number, sign?: '+' | '-' | '' } = {}) {
+  constructor ({ hour = 0, minute = 0, second = 0, sign = '' }: { hour?: number, minute?: number, second?: number, sign?: '+' | '-' | '' } = {}) {
     this.hour = hour
     this.minute = minute
     this.second = second
     this.sign = sign
   }
-  static fromString(text: string): HMS {
+
+  static fromString (text: string): HMS {
     const hms = new HMS()
 
     if (text.includes('min') && !text.includes('s')) {
@@ -43,7 +44,7 @@ class HMS {
     return hms
   }
 
-  toString(): string {
+  toString (): string {
     let result = ''
     if (this.hour > 0) {
       result += `${this.hour % 24 ?? 0} h`
@@ -60,7 +61,7 @@ class HMS {
   /** Sortie string sans la dernière unité si elle n'est pas seule
    * Exemples : 4 h 12 ou 2 min 54
    */
-  toString2(): string {
+  toString2 (): string {
     if (this.hour > 0 && this.second === 0) return this.toString().replace(' min', '')
     else if (this.minute > 0) return this.toString().replace(' s', '')
     else return this.toString()
@@ -74,29 +75,29 @@ class HMS {
     return (this.toSeconds() === time.toSeconds())
   }
 
-  isEquivalentToString(text: string): boolean {
+  isEquivalentToString (text: string): boolean {
     return HMS.fromString(text).toSeconds() === this.toSeconds()
   }
 
-  toSecondsString(): string {
+  toSecondsString (): string {
     return `${this.toSeconds()} s`
   }
 
-  toSeconds(): number {
+  toSeconds (): number {
     return this.hour * 3600 + this.minute * 60 + this.second
   }
 
   /**
    * Normalise l'écriture au format HMS. Les secondes et les minutes seront inférieures à 60
    */
-  normalize(): void {
+  normalize (): void {
     this.minute += Math.floor(this.second / 60)
     this.second = this.second % 60
     this.hour += Math.floor(this.minute / 60)
     this.minute = this.minute % 60
   }
 
-  add(time: HMS): HMS {
+  add (time: HMS): HMS {
     const result = new HMS()
     result.second = this.toSeconds() + time.toSeconds()
     result.normalize()
@@ -108,7 +109,7 @@ class HMS {
    * @param time HMS
    * @returns HMS
    */
-  substract(time: HMS): HMS {
+  substract (time: HMS): HMS {
     const result = new HMS()
     result.second = Math.abs(this.toSeconds() - time.toSeconds())
     result.normalize()
