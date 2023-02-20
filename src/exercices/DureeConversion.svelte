@@ -45,7 +45,7 @@
     typeFeedbackFinal = ''
     operation2Selected = ''
   }
-  
+
   function initChecksPartie2(): void {
     isHours2 = false
     isMinutes2 = false
@@ -122,6 +122,12 @@
     else if (!isHours2 || !isMinutes2 || !isSeconds2) typeFeedbackFinal = 'tryAgain'
     else typeFeedbackFinal = 'success'
   }
+
+  function restartExercice(): void {
+    timeInSeconds = randint(3800, 9000)
+    operation1Selected = ''
+    initChecksPartie1()
+  }
 </script>
 
 <svelte:head>
@@ -187,6 +193,11 @@
               min <span contenteditable="true" class="reponse" on:keyup={checkSeconds2} bind:this={spanSeconds2} /> s.
             </div>
             <Feedback type={typeFeedbackFinal} />
+            {#if typeFeedbackFinal === 'success'}
+              <div>
+                <button on:click={restartExercice}>Nouvelle Question</button>
+              </div>
+            {/if}
           </div>
         </div>
       {/if}
@@ -211,7 +222,10 @@
       <Feedback type={typeFeedbackDivisionPar3600Etape1} />
     </div>
     {#if isHours36001 && isSeconds36001 && (isMinutes36001 || spanMinutes36001?.innerText.length === 0)}
-    <p>Le nombre de secondes dépasse 60, donc on va chercher à convertir {timeInSeconds % 3600} s en minutes et secondes. Quel calcul souhaites-tu faire à présent ?</p>
+      <p>
+        Le nombre de secondes dépasse 60, donc on va chercher à convertir {timeInSeconds % 3600} s en minutes et secondes. Quel calcul souhaites-tu
+        faire à présent ?
+      </p>
       <select bind:value={operation2Selected} on:change={initChecksPartie2}>
         <option value="" />
         <option value="Multiplication">Multiplier {timeInSeconds % 3600} par 60</option>
@@ -220,25 +234,30 @@
         <option value="Division">Diviser {timeInSeconds} par 60</option>
       </select>
       {#if operation2Selected === 'DivisionReste'}
-      <div id="calcul2">
-        <div>
-          Le nombre de secondes dépasse 60, donc on va chercher le nombre de minutes.
-          <br />Il y a 60 secondes dans une minute donc on cherche combien de fois il y a 60 s dans {timeInSeconds % 3600} s.
-        </div>
-        <div class="operationPosee" />
-        {@html Operation({ operande1: Math.floor(timeInSeconds % 3600), operande2: 60, type: 'division' })}
-        <div>
+        <div id="calcul2">
           <div>
-            Finalement {timeInSeconds} s = <span contenteditable="true" class="reponse" on:keyup={checkHours2} bind:this={spanHours2} /> h
-            <span contenteditable="true" class="reponse" on:keyup={checkMinutes2} bind:this={spanMinutes2} />
-            min <span contenteditable="true" class="reponse" on:keyup={checkSeconds2} bind:this={spanSeconds2} /> s.
+            Le nombre de secondes dépasse 60, donc on va chercher le nombre de minutes.
+            <br />Il y a 60 secondes dans une minute donc on cherche combien de fois il y a 60 s dans {timeInSeconds % 3600} s.
           </div>
-          <Feedback type={typeFeedbackFinal} />
+          <div class="operationPosee" />
+          {@html Operation({ operande1: Math.floor(timeInSeconds % 3600), operande2: 60, type: 'division' })}
+          <div>
+            <div>
+              Finalement {timeInSeconds} s = <span contenteditable="true" class="reponse" on:keyup={checkHours2} bind:this={spanHours2} /> h
+              <span contenteditable="true" class="reponse" on:keyup={checkMinutes2} bind:this={spanMinutes2} />
+              min <span contenteditable="true" class="reponse" on:keyup={checkSeconds2} bind:this={spanSeconds2} /> s.
+            </div>
+            <Feedback type={typeFeedbackFinal} />
+            {#if typeFeedbackFinal === 'success'}
+              <div>
+                <button on:click={restartExercice}>Nouvelle Question</button>
+              </div>
+            {/if}
+          </div>
         </div>
-      </div>
       {/if}
       {#if operation2Selected === 'Multiplication' || operation2Selected === 'Division'}
-      <p>Non, il te faut choisir une autre opération.</p>
+        <p>Non, il te faut choisir une autre opération.</p>
       {/if}
     {/if}
   {/if}
