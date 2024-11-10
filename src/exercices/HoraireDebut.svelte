@@ -6,23 +6,23 @@
   import Title from '../ui/Title.svelte'
   import Feedback from '../ui/Feedback.svelte'
 
-  let divContainer: HTMLDivElement
-  let divEnonce: HTMLDivElement
-  let divStart: HTMLDivElement
-  let divMiddle: HTMLDivElement
-  let divMiddle2: HTMLDivElement
-  let divEnd: HTMLDivElement
-  let divStep1: HTMLDivElement
-  let divStep2: HTMLDivElement
-  let divStep3: HTMLDivElement
-  let divStepTotal: HTMLDivElement
-  let numberOfSteps = 1
+  let divContainer: HTMLDivElement = $state()
+  let divEnonce: HTMLDivElement = $state()
+  let divStart: HTMLDivElement = $state()
+  let divMiddle: HTMLDivElement = $state()
+  let divMiddle2: HTMLDivElement = $state()
+  let divEnd: HTMLDivElement = $state()
+  let divStep1: HTMLDivElement = $state()
+  let divStep2: HTMLDivElement = $state()
+  let divStep3: HTMLDivElement = $state()
+  let divStepTotal: HTMLDivElement = $state()
+  let numberOfSteps = $state(1)
   let lineStartMiddle: LeaderLine
   let lineMiddleMiddle2: LeaderLine
   let lineMiddleEnd: LeaderLine
   let lineMiddle2End: LeaderLine
   let lineTotal: LeaderLine
-  let typeFeedback: '' | 'success' | 'tryAgain' = ''
+  let typeFeedback: '' | 'success' | 'tryAgain' = $state('')
 
   function initValues(): void {
     const startHour = new Hms({ hour: randint(2, 21), minute: randint(1, 59) })
@@ -172,43 +172,43 @@
 <Title>Déterminer l'heure du début</Title>
 
 <div style="max-width: 800px; margin: 50px auto auto;">
-  <div bind:this={divEnonce} style="margin-bottom: 50px;" />
+  <div bind:this={divEnonce} style="margin-bottom: 50px;"></div>
   <div id="container" bind:this={divContainer}>
-    <div bind:this={divStart} on:keyup={checkAllStep} class="reponse" contenteditable="true" style="grid-column: 1; grid-row: 2;" />
-    <div bind:this={divMiddle} on:keyup={checkAllStep} class="reponse" contenteditable="true" style="grid-column: 3; grid-row: 2;" />
-    <div bind:this={divMiddle2} on:keyup={checkAllStep} class="reponse" contenteditable="true" style="grid-column: 5; grid-row: 2;" />
-    <div bind:this={divEnd} class="donnee" style="grid-row: 2; grid-column: {numberOfSteps === 1 ? 5 : 7};" />
+    <div bind:this={divStart} onkeyup={checkAllStep} class="reponse" contenteditable="true" style="grid-column: 1; grid-row: 2;"></div>
+    <div bind:this={divMiddle} onkeyup={checkAllStep} class="reponse" contenteditable="true" style="grid-column: 3; grid-row: 2;"></div>
+    <div bind:this={divMiddle2} onkeyup={checkAllStep} class="reponse" contenteditable="true" style="grid-column: 5; grid-row: 2;"></div>
+    <div bind:this={divEnd} class="donnee" style="grid-row: 2; grid-column: {numberOfSteps === 1 ? 5 : 7};"></div>
     <div
       bind:this={divStep1}
-      on:click={removeQuestionMark}
-      on:keyup={checkAllStep}
+      onclick={removeQuestionMark}
+      onkeyup={checkAllStep}
       class="reponse"
       contenteditable="true"
       style="grid-column: 2; grid-row: 1;"
-    />
+></div>
     <div
       bind:this={divStep2}
-      on:click={removeQuestionMark}
-      on:keyup={checkAllStep}
+      onclick={removeQuestionMark}
+      onkeyup={checkAllStep}
       class="reponse"
       contenteditable="true"
       style="grid-column: 4; grid-row: 1;"
-    />
+></div>
     <div
       bind:this={divStep3}
-      on:click={removeQuestionMark}
-      on:keyup={checkAllStep}
+      onclick={removeQuestionMark}
+      onkeyup={checkAllStep}
       class="reponse"
       contenteditable="true"
       style="grid-column: 6; grid-row: 1;"
-    />
-    <div bind:this={divStepTotal} class="donnee" contenteditable="true" style="grid-row: 3; grid-column: {numberOfSteps === 1 ? 3 : 4}" />
+></div>
+    <div bind:this={divStepTotal} class="donnee" contenteditable="true" style="grid-row: 3; grid-column: {numberOfSteps === 1 ? 3 : 4}"></div>
   </div>
 
   <div id="footerExercice">
-    <button on:click={switchSteps}>{numberOfSteps === 1 ? 'Ajouter une étape' : 'Supprimer une étape'} </button>
-    <button on:click={initValues}>Nouvelle Question</button>
-    <button on:click={checkExercice}>Vérifier</button>
+    <button onclick={switchSteps}>{numberOfSteps === 1 ? 'Ajouter une étape' : 'Supprimer une étape'} </button>
+    <button onclick={initValues}>Nouvelle Question</button>
+    <button onclick={checkExercice}>Vérifier</button>
     <Feedback type={typeFeedback} />
   </div>
 </div>

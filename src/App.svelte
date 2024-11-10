@@ -1,11 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-
-  let ComponentExercice
-
+  let ComponentExercice = $state()
 
 
-  let refresh = true
+
+  let refresh = $state(true)
 
   async function router(): Promise<void> {
     const url = new URL(document.URL)
@@ -26,12 +25,12 @@
 
 <main>
   {#key refresh}
-    <svelte:component this={ComponentExercice} />
+    <ComponentExercice />
   {/key}
 </main>
 
 <footer>
-  <img src="/images/logo2.png" width="125px" alt="Coopmaths CC-BY-SA" />
+  <img src="images/logo2.png" width="125px" alt="Coopmaths CC-BY-SA" />
 </footer>
 
 <style>

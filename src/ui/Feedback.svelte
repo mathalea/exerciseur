@@ -1,5 +1,9 @@
 <script lang="ts">
-  export let type: 'success' | 'tryAgain' | ''
+  interface Props {
+    type: 'success' | 'tryAgain' | '';
+  }
+
+  let { type }: Props = $props();
 </script>
 
 {#if type === 'success'}
