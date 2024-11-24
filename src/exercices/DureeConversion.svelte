@@ -9,7 +9,7 @@
   let spanSeconds1: HTMLSpanElement = $state()
   let isMinutes1 = $state(false)
   let isSeconds1 = $state(false)
-  let typeFeedbackDivisionPar60Etape1: '' | 'tryAgain' = $state()
+  let typeFeedbackDivisionPar60Etape1: '' | 'tryAgain' = $state('')
   /** Division par 60 étape 2*/
   let spanHours2: HTMLSpanElement = $state()
   let spanMinutes2: HTMLSpanElement = $state()
@@ -79,10 +79,6 @@
     checkStep36001()
   }
 
-  function checkMinutes36001(): void {
-    isMinutes36001 = check(spanMinutes36001, 0)
-    checkStep36001()
-  }
 
   function checkHours36001(): void {
     isHours36001 = check(spanHours36001, Math.floor(timeInSeconds / 3600))
@@ -91,7 +87,7 @@
 
   function checkStep36001(): void {
     if (spanHours36001.innerText.length === 0 || spanSeconds36001.innerText.length === 0) typeFeedbackDivisionPar3600Etape1 = ''
-    else if (!isHours36001 || (!isMinutes36001 && spanMinutes36001.innerText.length > 0) || !isSeconds36001)
+    else if (!isHours36001 || !isSeconds36001)
       typeFeedbackDivisionPar3600Etape1 = 'tryAgain'
     else typeFeedbackDivisionPar3600Etape1 = ''
   }
@@ -216,12 +212,11 @@
       {@html Operation({ operande1: timeInSeconds, operande2: 3600, type: 'division' })}
       <div>
         Donc {timeInSeconds} s = <span contenteditable="true" class="reponse" bind:this={spanHours36001} onkeyup={checkHours36001}></span> h
-        <span contenteditable="true" bind:this={spanMinutes36001} class="reponse" onkeyup={checkMinutes36001}></span> min
         <span contenteditable="true" bind:this={spanSeconds36001} class="reponse" onkeyup={checkSeconds36001}></span> s.
       </div>
       <Feedback type={typeFeedbackDivisionPar3600Etape1} />
     </div>
-    {#if isHours36001 && isSeconds36001 && (isMinutes36001 || spanMinutes36001?.innerText.length === 0)}
+    {#if isHours36001 && isSeconds36001}
       <p>
         Le nombre de secondes dépasse 60, donc on va chercher à convertir {timeInSeconds % 3600} s en minutes et secondes. Quel calcul souhaites-tu
         faire à présent ?
