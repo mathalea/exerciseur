@@ -1,11 +1,12 @@
 <script lang="ts">
+  import "./app.css";
   import { onMount } from 'svelte'
   let ComponentExercice = $state()
-
-
-
+  
+  
+  
   let refresh = $state(true)
-
+  
   async function router(): Promise<void> {
     const url = new URL(document.URL)
     const params = url.search
@@ -18,7 +19,7 @@
     }
     refresh = !refresh
   }
-
+  
   window.addEventListener('load', router)
   window.addEventListener('hashchange', router)
 </script>
