@@ -1,5 +1,5 @@
 <script lang="ts">
-  const operandes = ["3", "5", "+", "1", "2"]
+const operandes = ["3", "5", "+", "1", "2"];
 </script>
 
 <main
